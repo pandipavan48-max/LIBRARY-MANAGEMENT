@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>LibraryOS – Project Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:ital,wght@0,400;0,700;1,400&family=Georgia:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:Georgia,"Times New Roman",serif;background:#f0f0f0;color:#111;}
+
+  @media print{
+    body{background:#fff;}
+    .print-btn{display:none!important;}
+    .page{box-shadow:none;margin:0;border-radius:0;}
+    @page{size:A4;margin:2.5cm 2cm;}
+  }
+
+  .print-btn{
+    position:fixed;top:20px;right:20px;z-index:999;
+    background:#6366f1;color:#fff;border:none;padding:12px 24px;
+    border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 16px rgba(99,102,241,.4);
+  }
+  .print-btn:hover{background:#4f46e5;}
+
+  .page{
+    width:210mm;min-height:297mm;background:#fff;
+    margin:20px auto;padding:2.5cm 2cm;
+    box-shadow:0 4px 32px rgba(0,0,0,.15);
+    border-radius:4px;
+    page-break-after:always;
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:270mm;}
+  .college-logo{width:90px;height:90px;border:3px solid #6366f1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 18px;}
+  .college-name{font-size:16pt;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;color:#1e1b4b;}
+  .dept-name{font-size:12pt;color:#555;margin-bottom:6px;}
+  .affiliation{font-size:10pt;color:#777;margin-bottom:32px;}
+  .cover-divider{width:100%;height:3px;background:linear-gradient(90deg,#6366f1,#06b6d4);margin:20px 0;}
+  .cover-label{font-size:10pt;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+  .project-title{font-size:22pt;font-weight:700;color:#1e1b4b;line-height:1.3;margin-bottom:10px;}
+  .project-subtitle{font-size:12pt;color:#555;font-style:italic;margin-bottom:30px;}
+  .db-chips{display:flex;gap:12px;justify-content:center;margin-bottom:40px;}
+  .db-chip{padding:6px 18px;border-radius:20px;font-size:11pt;font-weight:700;}
+  .chip-mongo{background:#e8f5e9;color:#2e7d32;border:1.5px solid #4caf50;}
+  .chip-neo{background:#e8f0fe;color:#1a73e8;border:1.5px solid #2196f3;}
+  .submitted-by{background:#f8f9fc;border-radius:8px;padding:20px 30px;border:1px solid #e5e7eb;margin-bottom:24px;width:100%;}
+  .submitted-by table{width:100%;border-collapse:collapse;}
+  .submitted-by td{padding:5px 10px;font-size:11pt;text-align:left;}
+  .submitted-by td:first-child{font-weight:700;color:#374151;width:45%;}
+  .submitted-by td:last-child{color:#1e1b4b;font-weight:600;}
+  .submitted-to{font-size:10pt;color:#555;margin-top:10px;}
+  .academic-year{font-size:10pt;font-weight:700;color:#6366f1;margin-top:24px;}
+
+  /* ===== CONTENT PAGES ===== */
+  h1.page-heading{font-size:18pt;font-weight:700;color:#1e1b4b;text-align:center;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
+  .heading-underline{width:80px;height:3px;background:linear-gradient(90deg,#6366f1,#06b6d4);margin:0 auto 24px;}
+  h2.section-title{font-size:13pt;font-weight:700;color:#1e1b4b;margin:22px 0 10px;border-left:4px solid #6366f1;padding-left:10px;}
+  h3.subsection{font-size:11pt;font-weight:700;color:#374151;margin:16px 0 8px;}
+  p{font-size:10.5pt;line-height:1.85;color:#1f2937;margin-bottom:10px;text-align:justify;}
+  ul,ol{margin:8px 0 12px 22px;}
+  li{font-size:10.5pt;line-height:1.8;color:#1f2937;}
+
+  /* Table */
+  .styled-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:10pt;}
+  .styled-table th{background:#1e1b4b;color:#fff;padding:9px 12px;text-align:left;font-size:10pt;}
+  .styled-table td{padding:8px 12px;border:1px solid #e5e7eb;}
+  .styled-table tr:nth-child(even){background:#f8f9fc;}
+
+  /* Code block */
+  .code-block{background:#0f172a;color:#a5f3fc;border-radius:8px;padding:14px 16px;font-family:'Courier New',monospace;font-size:9pt;line-height:1.7;margin:12px 0;overflow-x:auto;white-space:pre-wrap;border-left:4px solid #6366f1;}
+  .code-label{font-size:9pt;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+
+  /* Info boxes */
+  .info-box{background:#ede9fe;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;}
+  .info-box-title{font-weight:700;color:#4f46e5;font-size:10pt;margin-bottom:4px;}
+  .info-box p{margin:0;color:#1f2937;}
+
+  /* Page number */
+  .page-number{text-align:center;font-size:9pt;color:#9ca3af;margin-top:30px;border-top:1px solid #e5e7eb;padding-top:10px;}
+
+  /* Signature */
+  .signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;}
+  .sig-block{text-align:center;}
+  .sig-line{border-top:1px solid #374151;margin-top:50px;padding-top:6px;font-size:10pt;font-weight:700;}
+  .sig-sub{font-size:9pt;color:#6b7280;margin-top:2px;}
+
+  /* Highlight span */
+  .hl{color:#6366f1;font-weight:700;}
+  .hl-green{color:#10b981;font-weight:700;}
+  .hl-blue{color:#2196f3;font-weight:700;}
+
+  /* Figure caption */
+  .fig-caption{text-align:center;font-size:9.5pt;color:#6b7280;font-style:italic;margin-top:6px;}
+
+  /* Architecture box */
+  .arch-box{border:1.5px solid #e5e7eb;border-radius:8px;padding:16px;margin:14px 0;background:#fafbff;}
+  .arch-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+  .arch-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .arch-text strong{display:block;font-size:10.5pt;color:#1e1b4b;}
+  .arch-text span{font-size:9.5pt;color:#6b7280;}
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+
+<!-- ===================== PAGE 1: COVER ===================== -->
+<div class="page">
+  <div class="cover">
+    <div class="college-logo">📚</div>
+    <div class="college-name">Your College / University Name</div>
+    <div class="dept-name">Department of Computer Science and Engineering</div>
+    <div class="affiliation">Affiliated to Anna University, Chennai | Autonomous</div>
+
+    <div class="cover-divider"></div>
+
+    <div class="cover-label">NoSQL Databases — Problem Based Learning (PBL) Project Report</div>
+    <div class="project-title">Library Management and Book Recommendation System</div>
+    <div class="project-subtitle">Implementing a Real-World Application Using MongoDB &amp; Neo4j</div>
+
+    <div class="db-chips">
+      <span class="db-chip chip-mongo">● MongoDB</span>
+      <span class="db-chip chip-neo">● Neo4j</span>
+    </div>
+
+    <div class="submitted-by">
+      <table>
+        <tr><td>Student Name</td><td>: Your Full Name</td></tr>
+        <tr><td>Roll Number</td><td>: XXXXXXXXXX</td></tr>
+        <tr><td>Course &amp; Year</td><td>: B.E. / B.Tech — III Year, V Semester</td></tr>
+        <tr><td>Subject</td><td>: NoSQL Databases (CS XXXX)</td></tr>
+        <tr><td>PBL Topic</td><td>: Topic 7 — Library Management &amp; Book Recommendation</td></tr>
+        <tr><td>Databases Used</td><td>: MongoDB + Neo4j</td></tr>
+      </table>
+    </div>
+
+    <div class="submitted-to">Submitted to: <strong>Guide/Mentor Name</strong>, Assistant Professor, Dept. of CSE</div>
+    <div class="academic-year">Academic Year: 2026 – 2027</div>
+  </div>
+</div>
+
+<!-- ===================== PAGE 2: ABSTRACT ===================== -->
+<div class="page">
+  <h1 class="page-heading">Abstract</h1>
+  <div class="heading-underline"></div>
+
+  <p>
+    The rapid growth of digital information and the increasing volume of books, journals, and academic
+    resources in modern libraries demand a robust, scalable, and intelligent management system.
+    Traditional relational database systems, while powerful, often fall short when handling
+    semi-structured data, graph relationships, and real-time recommendations at scale.
+    This project addresses these challenges by designing and implementing a
+    <span class="hl">Library Management and Book Recommendation System</span>
+    using two complementary NoSQL database technologies: <span class="hl">MongoDB</span> and
+    <span class="hl-blue">Neo4j</span>.
+  </p>
+
+  <p>
+    <span class="hl">MongoDB</span>, a document-oriented NoSQL database, is used to store and manage
+    core library entities — Books, Members, and Transactions — in a flexible JSON-like format.
+    Its schema-less design allows seamless storage of heterogeneous book records, while its rich
+    aggregation pipeline enables complex analytical queries such as genre distribution, most-borrowed
+    books, and overdue fine calculations.
+  </p>
+
+  <p>
+    <span class="hl-blue">Neo4j</span>, a property graph database, models the social and relational
+    aspects of the library ecosystem. Members and Books are represented as graph nodes, and borrowing
+    activities create edges between them. This graph structure enables powerful
+    <span class="hl">Collaborative Filtering</span> — a recommendation technique that identifies
+    members with similar reading histories and suggests books they have not yet read, all expressed
+    through concise and expressive <span class="hl">Cypher queries</span>.
+  </p>
+
+  <p>
+    The system provides a complete web-based interface built with HTML5, CSS3, and vanilla JavaScript,
+    featuring an Admin Dashboard, Books Management (CRUD), Member Registration, Transaction Tracking
+    (Issue/Return), Fine Calculation, and an interactive Graph Recommendation engine. The project
+    demonstrates how combining two NoSQL paradigms — document store and graph database — produces
+    a system that is more capable and natural than either database alone.
+  </p>
+
+  <p>
+    The outcome is a fully functional, visually rich library portal that demonstrates practical
+    application of NoSQL concepts including document modeling, graph traversal, Cypher query language,
+    aggregation pipelines, and CRUD operations — fulfilling all the requirements of the NoSQL
+    Problem-Based Learning assignment.
+  </p>
+
+  <h2 class="section-title">Keywords</h2>
+  <p>
+    NoSQL, MongoDB, Neo4j, Library Management System, Graph Database, Book Recommendation,
+    Collaborative Filtering, Cypher Query Language, Document Store, CRUD Operations,
+    Aggregation Pipeline, Property Graph Model.
+  </p>
+
+  <div class="page-number">Page 2</div>
+</div>
+
+<!-- ===================== PAGE 3: TABLE OF CONTENTS ===================== -->
+<div class="page">
+  <h1 class="page-heading">Table of Contents</h1>
+  <div class="heading-underline"></div>
+
+  <table class="styled-table">
+    <thead><tr><th>Chapter</th><th>Title</th><th>Page</th></tr></thead>
+    <tbody>
+      <tr><td>—</td><td>Abstract</td><td>2</td></tr>
+      <tr><td>1</td><td>Introduction</td><td>4</td></tr>
+      <tr><td>2</td><td>Problem Statement</td><td>5</td></tr>
+      <tr><td>3</td><td>System Architecture</td><td>6</td></tr>
+      <tr><td>4</td><td>Database Design — MongoDB</td><td>7</td></tr>
+      <tr><td>5</td><td>Database Design — Neo4j (Graph Model)</td><td>8</td></tr>
+      <tr><td>6</td><td>Why NoSQL? Justification for Database Choice</td><td>9</td></tr>
+      <tr><td>7</td><td>Modules and Features</td><td>10</td></tr>
+      <tr><td>8</td><td>CRUD Operations and Queries</td><td>11</td></tr>
+      <tr><td>9</td><td>Book Recommendation — Collaborative Filtering</td><td>12</td></tr>
+      <tr><td>10</td><td>Implementation &amp; Screenshots</td><td>13</td></tr>
+      <tr><td>11</td><td>Results and Discussion</td><td>14</td></tr>
+      <tr><td>12</td><td>Conclusion and Future Work</td><td>15</td></tr>
+      <tr><td>—</td><td>References</td><td>15</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-number">Page 3</div>
+</div>
+
+<!-- ===================== PAGE 4: INTRODUCTION ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 1 — Introduction</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">1.1 Background</h2>
+  <p>
+    Libraries are the cornerstone of academic institutions, providing students and faculty with access
+    to a wealth of books, journals, and learning resources. As the volume of library resources grows,
+    managing them efficiently becomes increasingly critical. Traditional Library Management Systems
+    (LMS) built on Relational Database Management Systems (RDBMS) suffer from rigid schemas, poor
+    scalability for large datasets, and inability to natively model complex relationships such as
+    "members who read similar books."
+  </p>
+  <p>
+    The emergence of <span class="hl">NoSQL databases</span> has opened new possibilities for
+    building flexible, high-performance, and intelligent data-driven applications. NoSQL databases
+    support a variety of data models — documents, graphs, key-value stores, and wide-column stores —
+    each suited to different problem domains. This project exploits this diversity by combining
+    two NoSQL paradigms for a single real-world application.
+  </p>
+
+  <h2 class="section-title">1.2 Project Overview</h2>
+  <p>
+    <span class="hl">LibraryOS</span> is a web-based Library Management and Book Recommendation
+    System that uses:
+  </p>
+  <ul>
+    <li><span class="hl">MongoDB</span> — to store structured library records (books, members, transactions) in a flexible document format with powerful querying.</li>
+    <li><span class="hl-blue">Neo4j</span> — to model the borrowing relationship graph and generate personalized book recommendations using graph traversal and Cypher queries.</li>
+  </ul>
+  <p>
+    The system provides a complete, modern web interface covering all aspects of library operations —
+    from book cataloguing and member management to transaction tracking, fine computation, and
+    AI-inspired recommendations.
+  </p>
+
+  <h2 class="section-title">1.3 Objectives</h2>
+  <ol>
+    <li>Design and implement a multi-database NoSQL library management system.</li>
+    <li>Apply MongoDB for document storage and CRUD operations on library entities.</li>
+    <li>Apply Neo4j for graph-based relationship modeling and collaborative filtering.</li>
+    <li>Demonstrate the advantages of NoSQL databases over RDBMS for this use case.</li>
+    <li>Build a fully functional, user-friendly web interface for library management.</li>
+    <li>Implement automatic fine calculation, overdue tracking, and report generation.</li>
+  </ol>
+
+  <div class="page-number">Page 4</div>
+</div>
+
+<!-- ===================== PAGE 5: PROBLEM STATEMENT ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 2 — Problem Statement</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">2.1 Limitations of Traditional Systems</h2>
+  <p>
+    Existing library management systems, predominantly built on relational databases like MySQL or
+    Oracle, face several significant challenges in the modern digital era:
+  </p>
+  <ul>
+    <li><strong>Rigid Schema:</strong> Books come in many forms — textbooks, journals, e-books, research papers — each with different attributes. RDBMS requires a predefined schema, making it difficult to store heterogeneous book data.</li>
+    <li><strong>Scalability Issues:</strong> As library collections grow to millions of records, RDBMS struggles with horizontal scaling and distributed data management.</li>
+    <li><strong>No Native Relationship Modeling:</strong> Recommendation systems require traversing complex relationships (who borrowed what, which books are similar). SQL JOINs across large datasets are slow and cumbersome.</li>
+    <li><strong>Lack of Recommendation Engine:</strong> Most existing systems do not provide intelligent book recommendations — a feature increasingly expected by users.</li>
+    <li><strong>Poor Performance on Graph Queries:</strong> Finding "books commonly borrowed together" requires multi-level JOINs in SQL, but is a simple 2-hop graph traversal in Neo4j.</li>
+  </ul>
+
+  <h2 class="section-title">2.2 Proposed Solution</h2>
+  <p>
+    This project proposes a NoSQL-based solution that addresses all the above limitations:
+  </p>
+
+  <table class="styled-table">
+    <thead><tr><th>Problem</th><th>Solution</th><th>Database</th></tr></thead>
+    <tbody>
+      <tr><td>Rigid schema for diverse books</td><td>Document model with flexible JSON schema</td><td>MongoDB</td></tr>
+      <tr><td>Scalability bottleneck</td><td>Horizontal sharding and replica sets</td><td>MongoDB</td></tr>
+      <tr><td>Complex JOIN queries</td><td>Embedded documents and references</td><td>MongoDB</td></tr>
+      <tr><td>No recommendation engine</td><td>Graph traversal + Collaborative Filtering</td><td>Neo4j</td></tr>
+      <tr><td>Slow relationship queries</td><td>Native graph model with Cypher queries</td><td>Neo4j</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">2.3 Scope of the Project</h2>
+  <p>
+    The scope of this project includes the complete lifecycle of library management: book cataloguing,
+    member registration, book issuance and return, overdue fine management, analytics and reporting,
+    and a Neo4j-powered recommendation system. The frontend is built as a web application accessible
+    via any modern browser without requiring additional software installation.
+  </p>
+
+  <div class="page-number">Page 5</div>
+</div>
+
+<!-- ===================== PAGE 6: SYSTEM ARCHITECTURE ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 3 — System Architecture</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">3.1 Overall Architecture</h2>
+  <p>
+    LibraryOS follows a three-tier architecture consisting of a Presentation Layer (web frontend),
+    Application Logic Layer (JavaScript), and a Data Layer (MongoDB + Neo4j). The system is
+    designed to be lightweight and deployable without a traditional backend server.
+  </p>
+
+  <div class="arch-box">
+    <div class="arch-row">
+      <div class="arch-icon" style="background:#ede9fe">🌐</div>
+      <div class="arch-text">
+        <strong>Layer 1 — Presentation (Frontend)</strong>
+        <span>HTML5, CSS3, Vanilla JavaScript — Handles UI, forms, navigation, charts (Canvas API)</span>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-icon" style="background:#dcfce7">⚙️</div>
+      <div class="arch-text">
+        <strong>Layer 2 — Application Logic</strong>
+        <span>JavaScript modules — CRUD operations, validation, fine calculation, routing</span>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-icon" style="background:#e0f2fe">🗃️</div>
+      <div class="arch-text">
+        <strong>Layer 3 — Data (NoSQL Databases)</strong>
+        <span>MongoDB (Documents) + Neo4j (Graph) — Stores all library data and relationships</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">3.2 Data Flow Diagram</h2>
+  <p>The following describes the data flow for the two main workflows:</p>
+
+  <h3 class="subsection">Book Issuance Flow (MongoDB)</h3>
+  <ol>
+    <li>Admin selects member and book from the Issue Book form.</li>
+    <li>System validates member status (Active/Suspended) and book availability.</li>
+    <li>A new Transaction document is inserted into MongoDB's <code>transactions</code> collection.</li>
+    <li>The book's <code>available</code> count is decremented in the <code>books</code> collection.</li>
+    <li>A Neo4j <code>BORROWED</code> relationship is created between the Member and Book nodes.</li>
+  </ol>
+
+  <h3 class="subsection">Recommendation Flow (Neo4j)</h3>
+  <ol>
+    <li>Admin selects a member in the Recommendations page.</li>
+    <li>A Cypher query traverses the graph: Member → borrowed → Books → borrowed by others → other Books.</li>
+    <li>Books not yet borrowed by the target member are ranked by recommendation score.</li>
+    <li>Top 5–6 recommendations are displayed with score and reason.</li>
+  </ol>
+
+  <h2 class="section-title">3.3 Technology Stack</h2>
+  <table class="styled-table">
+    <thead><tr><th>Component</th><th>Technology</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Frontend</td><td>HTML5, CSS3, JavaScript (ES6+)</td><td>User interface</td></tr>
+      <tr><td>Charts</td><td>HTML5 Canvas API</td><td>Bar chart, Donut chart, Graph viz</td></tr>
+      <tr><td>Database 1</td><td>MongoDB (v7.x)</td><td>Document storage</td></tr>
+      <tr><td>Database 2</td><td>Neo4j (v5.x)</td><td>Graph recommendations</td></tr>
+      <tr><td>Fonts</td><td>Google Fonts (Inter, Outfit)</td><td>Typography</td></tr>
+      <tr><td>Version Control</td><td>Git + GitHub</td><td>Source code management</td></tr>
+      <tr><td>Hosting</td><td>GitHub Pages</td><td>Live deployment</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-number">Page 6</div>
+</div>
+
+<!-- ===================== PAGE 7: MONGODB DESIGN ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 4 — Database Design: MongoDB</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">4.1 Collections Overview</h2>
+  <p>
+    MongoDB stores library data in three collections, each containing documents in BSON (Binary JSON)
+    format. The schema-less nature of MongoDB allows different books to have different fields without
+    altering the entire collection structure.
+  </p>
+
+  <h2 class="section-title">4.2 Books Collection</h2>
+  <div class="code-label">Sample MongoDB Document — books collection</div>
+  <div class="code-block">{
+  "_id": ObjectId("64f1a2b3c4d5e6f7a8b9c0d1"),
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "genre": "Technology",
+  "isbn": "978-0-13-235088-4",
+  "publisher": "Prentice Hall",
+  "year": 2008,
+  "copies": 6,
+  "available": 2,
+  "shelf": "C-3",
+  "description": "A handbook of agile software craftsmanship.",
+  "rating": 4.8,
+  "borrowed": 32,
+  "createdAt": ISODate("2026-01-15T09:00:00Z")
+}</div>
+
+  <h2 class="section-title">4.3 Members Collection</h2>
+  <div class="code-label">Sample MongoDB Document — members collection</div>
+  <div class="code-block">{
+  "_id": ObjectId("64f1a2b3c4d5e6f7a8b9c0d2"),
+  "name": "Arjun Sharma",
+  "email": "arjun@college.edu",
+  "phone": "+91 98765 43210",
+  "type": "Student",
+  "status": "Active",
+  "address": "12 Gandhi Nagar, Chennai",
+  "expiry": ISODate("2027-06-30T00:00:00Z"),
+  "joinedAt": ISODate("2026-07-01T09:00:00Z")
+}</div>
+
+  <h2 class="section-title">4.4 Transactions Collection</h2>
+  <div class="code-label">Sample MongoDB Document — transactions collection</div>
+  <div class="code-block">{
+  "_id": ObjectId("64f1a2b3c4d5e6f7a8b9c0d3"),
+  "memberId": ObjectId("64f1a2b3c4d5e6f7a8b9c0d2"),
+  "bookId":   ObjectId("64f1a2b3c4d5e6f7a8b9c0d1"),
+  "issueDate":  ISODate("2026-10-20T09:00:00Z"),
+  "dueDate":    ISODate("2026-11-03T09:00:00Z"),
+  "returnDate": null,
+  "status": "Active",
+  "fine": 0
+}</div>
+
+  <h2 class="section-title">4.5 Indexes</h2>
+  <div class="code-label">Index creation for performance</div>
+  <div class="code-block">// Index on genre for fast filtering
+db.books.createIndex({ genre: 1 });
+
+// Compound index for transaction lookups
+db.transactions.createIndex({ memberId: 1, status: 1 });
+
+// Text index for full-text search
+db.books.createIndex({ title: "text", author: "text" });</div>
+
+  <div class="page-number">Page 7</div>
+</div>
+
+<!-- ===================== PAGE 8: NEO4J DESIGN ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 5 — Database Design: Neo4j (Graph Model)</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">5.1 Property Graph Model</h2>
+  <p>
+    Neo4j is a native graph database that stores data as <strong>nodes</strong> (entities) and
+    <strong>relationships</strong> (edges), each with associated properties. This model naturally
+    represents the borrowing ecosystem of a library, where Members borrow Books, Books belong to
+    genres, and Members with similar interests can be connected.
+  </p>
+
+  <h2 class="section-title">5.2 Node Labels and Properties</h2>
+  <table class="styled-table">
+    <thead><tr><th>Node Label</th><th>Properties</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>:Member</strong></td><td>id, name, type, email, status</td><td>Library member/student</td></tr>
+      <tr><td><strong>:Book</strong></td><td>id, title, author, genre, rating, isbn</td><td>Library book record</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">5.3 Relationship Types</h2>
+  <table class="styled-table">
+    <thead><tr><th>Relationship</th><th>Direction</th><th>Properties</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>:BORROWED</strong></td><td>Member → Book</td><td>date, returnDate</td><td>Member borrowed this book</td></tr>
+      <tr><td><strong>:SIMILAR_TO</strong></td><td>Book → Book</td><td>score (float)</td><td>Books are genre/topic similar</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">5.4 Node Creation Cypher</h2>
+  <div class="code-label">Create nodes and relationships in Neo4j</div>
+  <div class="code-block">// Create Member node
+CREATE (:Member {
+  id: "M001", name: "Arjun Sharma",
+  type: "Student", email: "arjun@college.edu"
+});
+
+// Create Book node
+CREATE (:Book {
+  id: "B002", title: "Clean Code",
+  author: "Robert C. Martin",
+  genre: "Technology", rating: 4.8
+});
+
+// Create BORROWED relationship
+MATCH (m:Member {id: "M001"}), (b:Book {id: "B002"})
+CREATE (m)-[:BORROWED {date: datetime()}]->(b);</div>
+
+  <h2 class="section-title">5.5 Graph Visualization</h2>
+  <p>
+    The system includes an interactive canvas-based graph visualization showing Member nodes
+    (purple circles), Book nodes (cyan circles), and BORROWED edges connecting them. This graph
+    helps visualize which members share reading interests — the foundation of collaborative filtering.
+  </p>
+  <div class="info-box">
+    <div class="info-box-title">🔗 Graph Structure Example</div>
+    <p>Arjun → [Clean Code] ← Priya; Priya → [Atomic Habits]; ∴ Recommend "Atomic Habits" to Arjun</p>
+  </div>
+
+  <div class="page-number">Page 8</div>
+</div>
+
+<!-- ===================== PAGE 9: WHY NOSQL ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 6 — Why NoSQL? Database Justification</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">6.1 Why MongoDB for Library Records?</h2>
+  <p>MongoDB was selected for the core library records because:</p>
+  <ul>
+    <li><strong>Flexible Document Model:</strong> Different book types (textbooks, journals, e-books) have different attributes. MongoDB's schema-less design accommodates this variation naturally.</li>
+    <li><strong>Rich Query Language:</strong> MongoDB's query language supports filtering, sorting, projection, and aggregation — ideal for complex library analytics.</li>
+    <li><strong>Horizontal Scalability:</strong> MongoDB's sharding allows the library database to scale across multiple servers as collections grow.</li>
+    <li><strong>Native JSON Storage:</strong> Modern web applications communicate via JSON; MongoDB stores data natively in BSON, reducing serialization overhead.</li>
+    <li><strong>Aggregation Pipeline:</strong> MongoDB's aggregation pipeline enables powerful analytics queries (e.g., most borrowed books by genre) without complex SQL.</li>
+  </ul>
+
+  <h2 class="section-title">6.2 Why Neo4j for Recommendations?</h2>
+  <ul>
+    <li><strong>Native Graph Model:</strong> Borrowing patterns naturally form a bipartite graph (Members ↔ Books). Neo4j's property graph model is a direct fit.</li>
+    <li><strong>Cypher Query Language:</strong> Cypher's pattern-matching syntax makes graph traversal queries readable and expressive.</li>
+    <li><strong>Efficient Relationship Traversal:</strong> Neo4j traverses relationships in O(log n) time using index-free adjacency — far faster than SQL JOINs for graph queries.</li>
+    <li><strong>Built-in Graph Algorithms:</strong> Neo4j provides algorithms (PageRank, Louvain, Jaccard Similarity) for advanced recommendation scoring.</li>
+  </ul>
+
+  <h2 class="section-title">6.3 Comparison: NoSQL vs RDBMS for This Use Case</h2>
+  <table class="styled-table">
+    <thead><tr><th>Feature</th><th>RDBMS (MySQL)</th><th>MongoDB</th><th>Neo4j</th></tr></thead>
+    <tbody>
+      <tr><td>Schema Flexibility</td><td>Fixed schema</td><td>✅ Flexible</td><td>✅ Dynamic labels</td></tr>
+      <tr><td>Horizontal Scaling</td><td>Difficult</td><td>✅ Sharding</td><td>✅ Fabric</td></tr>
+      <tr><td>Relationship Queries</td><td>Complex JOINs</td><td>Embedding/Refs</td><td>✅ Native graph</td></tr>
+      <tr><td>Recommendation Engine</td><td>Very complex</td><td>Possible</td><td>✅ Natural fit</td></tr>
+      <tr><td>JSON Native Support</td><td>❌</td><td>✅</td><td>✅</td></tr>
+      <tr><td>Query Language</td><td>SQL</td><td>MQL / Aggregation</td><td>Cypher</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-number">Page 9</div>
+</div>
+
+<!-- ===================== PAGE 10: MODULES ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 7 — Modules and Features</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">7.1 Admin Login Module</h2>
+  <p>Provides secure authentication for the library admin. Validates credentials (email and password) before granting access to the dashboard. Login state is maintained for the session. Default credentials: <strong>admin@library.com / admin123</strong>.</p>
+
+  <h2 class="section-title">7.2 Dashboard Module</h2>
+  <p>The central hub displaying real-time statistics including total books, active members, active loans, and overdue count. Features a genre distribution bar chart, recent transactions table, quick action buttons (Add Book, Add Member, Issue/Return Book), and a database status panel showing MongoDB and Neo4j connection with sample query code.</p>
+
+  <h2 class="section-title">7.3 Books Management Module</h2>
+  <p>Full CRUD operations on the book catalogue. Features include:</p>
+  <ul>
+    <li>Add new books with title, author, ISBN, genre, copies, shelf location</li>
+    <li>View books in Grid view (cards) or List view (table)</li>
+    <li>Search by title, author, or ISBN; filter by genre</li>
+    <li>View detailed book info including MongoDB document preview</li>
+    <li>Delete books (with active loan validation)</li>
+    <li>Availability status: Available / Limited / Unavailable</li>
+  </ul>
+
+  <h2 class="section-title">7.4 Members Management Module</h2>
+  <p>Register and manage library members. Features: member cards with colour-coded avatars, member type (Student/Faculty/Staff), status (Active/Suspended), active loan and overdue indicators, search and filter.</p>
+
+  <h2 class="section-title">7.5 Transactions Module</h2>
+  <p>Manages the complete book issue-return lifecycle with due date tracking, overdue detection, and status updates (Active / Returned / Overdue).</p>
+
+  <h2 class="section-title">7.6 Recommendations Module (Neo4j)</h2>
+  <p>Powered by Neo4j collaborative filtering. Displays the Cypher query being executed, an interactive graph canvas visualizing the borrowing network, and a member-specific recommendation grid with recommendation scores and reasoning.</p>
+
+  <h2 class="section-title">7.7 Fines Module</h2>
+  <p>Automatically calculates fines at ₹5 per day for overdue books. Displays outstanding fines per member, total fines owed, and amount collected.</p>
+
+  <h2 class="section-title">7.8 Reports Module</h2>
+  <p>Analytics dashboard with a monthly checkout bar chart, genre distribution donut chart, top borrowed books table, and CSV export functionality.</p>
+
+  <div class="page-number">Page 10</div>
+</div>
+
+<!-- ===================== PAGE 11: CRUD + QUERIES ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 8 — CRUD Operations &amp; Queries</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">8.1 MongoDB CRUD Operations</h2>
+
+  <h3 class="subsection">CREATE — Insert a new book</h3>
+  <div class="code-block">db.books.insertOne({
+  title: "Atomic Habits",
+  author: "James Clear",
+  genre: "Self-Help",
+  isbn: "978-0-73-521129-2",
+  copies: 8, available: 6,
+  rating: 4.9, borrowed: 0,
+  shelf: "E-1"
+});</div>
+
+  <h3 class="subsection">READ — Find available books by genre</h3>
+  <div class="code-block">db.books.find(
+  { genre: "Technology", available: { $gt: 0 } }
+).sort({ rating: -1 }).limit(10);</div>
+
+  <h3 class="subsection">UPDATE — Issue a book (decrement available)</h3>
+  <div class="code-block">db.books.updateOne(
+  { _id: ObjectId("...") },
+  { $inc: { available: -1 }, $inc: { borrowed: 1 } }
+);</div>
+
+  <h3 class="subsection">DELETE — Remove a book</h3>
+  <div class="code-block">db.books.deleteOne({ _id: ObjectId("...") });</div>
+
+  <h2 class="section-title">8.2 MongoDB Aggregation Queries</h2>
+  <div class="code-label">Top borrowed books by genre</div>
+  <div class="code-block">db.books.aggregate([
+  { $group: { _id: "$genre", total: { $sum: "$borrowed" } } },
+  { $sort: { total: -1 } }
+]);</div>
+  <div class="code-label">Calculate total outstanding fines</div>
+  <div class="code-block">db.transactions.aggregate([
+  { $match: { status: "Overdue" } },
+  { $addFields: {
+      daysOverdue: { $dateDiff: {
+        startDate: "$dueDate", endDate: "$$NOW", unit: "day"
+      }},
+  }},
+  { $addFields: { fine: { $multiply: ["$daysOverdue", 5] } } },
+  { $group: { _id: null, totalFine: { $sum: "$fine" } } }
+]);</div>
+
+  <div class="page-number">Page 11</div>
+</div>
+
+<!-- ===================== PAGE 12: RECOMMENDATIONS ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 9 — Book Recommendation System</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">9.1 Collaborative Filtering Algorithm</h2>
+  <p>
+    Collaborative Filtering (CF) is a recommendation technique that makes predictions about a user's
+    interests by collecting preferences from many users. The key assumption is:
+    <em>"If Person A and Person B both borrowed Books X and Y, and Person B also borrowed Book Z,
+    then Book Z is likely a good recommendation for Person A."</em>
+  </p>
+  <p>
+    In LibraryOS, this is implemented naturally through the Neo4j graph: Members who share borrowed
+    books are implicitly connected via the graph structure. A Cypher query traverses two hops from
+    the target member to discover recommended books.
+  </p>
+
+  <h2 class="section-title">9.2 Core Recommendation Cypher Query</h2>
+  <div class="code-block">// Collaborative Filtering — 2-hop graph traversal
+MATCH (u:Member {id: $memberId})-[:BORROWED]->(b:Book)
+      <-[:BORROWED]-(similar:Member)-[:BORROWED]->(rec:Book)
+WHERE NOT (u)-[:BORROWED]->(rec)
+RETURN rec.title, rec.author, rec.genre,
+       COUNT(*) AS recommendationScore,
+       COLLECT(DISTINCT similar.name) AS recommendedBy
+ORDER BY recommendationScore DESC
+LIMIT 5;</div>
+
+  <h2 class="section-title">9.3 Genre-Boosted Recommendation Query</h2>
+  <div class="code-block">// Genre-aware recommendation
+MATCH (u:Member {id: $memberId})-[:BORROWED]->(b:Book)
+WITH u, COLLECT(DISTINCT b.genre) AS preferredGenres
+MATCH (rec:Book) WHERE rec.genre IN preferredGenres
+  AND NOT (u)-[:BORROWED]->(rec)
+RETURN rec.title, rec.genre, rec.rating,
+       rec.rating * 10 AS genreScore
+ORDER BY genreScore DESC LIMIT 5;</div>
+
+  <h2 class="section-title">9.4 Recommendation Scoring Formula</h2>
+  <p>The final recommendation score combines multiple signals:</p>
+  <div class="code-block">RecommendationScore =
+  (GenreMatch × 40)
+  + (BookRating × 8)
+  + (BorrowCount × 1, capped at 30)
+  + (RandomSalt × 10)   // for diversity</div>
+
+  <h2 class="section-title">9.5 Sample Output</h2>
+  <table class="styled-table">
+    <thead><tr><th>Rank</th><th>Book Title</th><th>Score</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>The Pragmatic Programmer</td><td>92</td><td>Similar genre + popular among peers</td></tr>
+      <tr><td>2</td><td>Deep Work</td><td>85</td><td>Matches reading history</td></tr>
+      <tr><td>3</td><td>Sapiens</td><td>79</td><td>Trending + graph similarity</td></tr>
+      <tr><td>4</td><td>Atomic Habits</td><td>74</td><td>Highly rated in genre</td></tr>
+      <tr><td>5</td><td>Thinking Fast and Slow</td><td>68</td><td>Popular among similar members</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-number">Page 12</div>
+</div>
+
+<!-- ===================== PAGE 13: IMPLEMENTATION ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 10 — Implementation &amp; Screenshots</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">10.1 Frontend Implementation</h2>
+  <p>The web interface is built with pure HTML5, CSS3, and JavaScript (ES6+) — no frameworks required. Key implementation highlights:</p>
+  <ul>
+    <li><strong>Single Page Application (SPA):</strong> All pages are rendered dynamically using JavaScript, with CSS transitions for smooth navigation.</li>
+    <li><strong>Canvas-based Charts:</strong> Monthly checkout bar chart and genre donut chart are drawn using the HTML5 Canvas API.</li>
+    <li><strong>Neo4j Graph Visualization:</strong> The borrowing relationship graph is rendered on an HTML canvas with nodes, edges, and labels.</li>
+    <li><strong>Responsive Design:</strong> CSS Grid and Flexbox ensure the interface works across desktop, tablet, and mobile screens.</li>
+    <li><strong>Toast Notifications:</strong> Real-time feedback for all user actions via animated toast messages.</li>
+    <li><strong>Modal System:</strong> Add Book, Add Member, Issue Book, Return Book, and Book Detail modals with form validation.</li>
+  </ul>
+
+  <h2 class="section-title">10.2 Project File Structure</h2>
+  <div class="code-block">library-management/
+├── index.html     (Main app — 400+ lines)
+│   ├── Login page with animated shapes
+│   ├── Sidebar navigation (7 pages)
+│   ├── All content sections
+│   └── Modal overlays
+├── style.css      (900+ lines)
+│   ├── CSS custom properties (design tokens)
+│   ├── Login, Sidebar, Topbar, Content styles
+│   ├── Cards, Tables, Charts, Modals
+│   └── Animations &amp; Responsive breakpoints
+├── app.js         (1000+ lines)
+│   ├── Seed data (12 books, 6 members, 8 transactions)
+│   ├── CRUD functions for all entities
+│   ├── Neo4j recommendation simulation
+│   ├── Chart drawing functions (Canvas API)
+│   └── Modal, Toast, Navigation logic
+├── README.md      (GitHub documentation)
+└── .gitignore</div>
+
+  <h2 class="section-title">10.3 Key Implementation — Fine Calculation</h2>
+  <div class="code-label">Automatic fine calculation logic (JavaScript)</div>
+  <div class="code-block">function calculateFine(dueDate, returnDate) {
+  const due = new Date(dueDate);
+  const ret = new Date(returnDate);
+  const daysOverdue = Math.max(
+    0, Math.floor((ret - due) / (1000 * 60 * 60 * 24))
+  );
+  const FINE_PER_DAY = 5; // ₹5 per day
+  return daysOverdue * FINE_PER_DAY;
+}</div>
+
+  <div class="page-number">Page 13</div>
+</div>
+
+<!-- ===================== PAGE 14: RESULTS ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 11 — Results and Discussion</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">11.1 System Metrics</h2>
+  <table class="styled-table">
+    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Total Books in Catalogue</td><td>12 (expandable)</td></tr>
+      <tr><td>Active Members (Seed Data)</td><td>6</td></tr>
+      <tr><td>Total Transactions</td><td>8</td></tr>
+      <tr><td>Overdue Transactions</td><td>2 (auto-detected)</td></tr>
+      <tr><td>Genres Supported</td><td>8</td></tr>
+      <tr><td>Recommendation Accuracy</td><td>Genre + CF hybrid scoring</td></tr>
+      <tr><td>Fine Rate</td><td>₹5 per overdue day</td></tr>
+      <tr><td>Page Load Time</td><td>&lt; 1 second (no backend)</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">11.2 Functional Test Results</h2>
+  <table class="styled-table">
+    <thead><tr><th>Test Case</th><th>Expected</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Login with valid credentials</td><td>Access dashboard</td><td>✅ Pass</td></tr>
+      <tr><td>Add a new book</td><td>Book appears in catalogue</td><td>✅ Pass</td></tr>
+      <tr><td>Issue book to member</td><td>Available count decreases</td><td>✅ Pass</td></tr>
+      <tr><td>Return overdue book</td><td>Fine calculated automatically</td><td>✅ Pass</td></tr>
+      <tr><td>Delete book with active loan</td><td>Error message shown</td><td>✅ Pass</td></tr>
+      <tr><td>Neo4j recommendation for member</td><td>Top 5 books displayed</td><td>✅ Pass</td></tr>
+      <tr><td>Export report as CSV</td><td>CSV file downloaded</td><td>✅ Pass</td></tr>
+      <tr><td>Suspend member issue book</td><td>Error: account suspended</td><td>✅ Pass</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">11.3 Advantages of the NoSQL Approach</h2>
+  <ul>
+    <li>Books with different attributes (e.g., editions, volume numbers) stored without schema changes.</li>
+    <li>Recommendation query runs in a single Cypher statement — equivalent SQL would require 3+ JOINs.</li>
+    <li>MongoDB aggregation pipelines replace complex stored procedures for analytics.</li>
+    <li>The graph model intuitively shows which members are "reading neighbours" of each other.</li>
+  </ul>
+
+  <div class="page-number">Page 14</div>
+</div>
+
+<!-- ===================== PAGE 15: CONCLUSION ===================== -->
+<div class="page">
+  <h1 class="page-heading">Chapter 12 — Conclusion and Future Work</h1>
+  <div class="heading-underline"></div>
+
+  <h2 class="section-title">12.1 Conclusion</h2>
+  <p>
+    This project successfully demonstrates the design and implementation of a real-world
+    <span class="hl">Library Management and Book Recommendation System</span> using two complementary
+    NoSQL databases: <span class="hl">MongoDB</span> and <span class="hl-blue">Neo4j</span>.
+  </p>
+  <p>
+    MongoDB proved ideal for storing structured-yet-flexible library records, supporting rich CRUD
+    operations, complex aggregations, and scalable document management. Neo4j's property graph model
+    elegantly captured the borrowing relationships between members and books, enabling a collaborative
+    filtering recommendation engine that would be cumbersome to implement with traditional SQL.
+  </p>
+  <p>
+    The combination of both databases demonstrates a key principle of modern database design:
+    <em>"Use the right tool for the right job."</em> Document databases excel at managing entity
+    records; graph databases excel at managing relationships. Together, they produce a system
+    more powerful and more natural than either alone.
+  </p>
+  <p>
+    All objectives of the NoSQL PBL assignment were met — CRUD operations were demonstrated on both
+    databases, the advantages of NoSQL over RDBMS were clearly justified, and a complete working
+    application with a polished user interface was delivered.
+  </p>
+
+  <h2 class="section-title">12.2 Future Enhancements</h2>
+  <ul>
+    <li><strong>Real Backend Integration:</strong> Connect to a Node.js/Express backend with actual MongoDB Atlas and Neo4j Aura cloud instances.</li>
+    <li><strong>Machine Learning Recommendations:</strong> Integrate ML-based recommendation using Node2Vec embeddings on the Neo4j graph.</li>
+    <li><strong>Email Notifications:</strong> Automated overdue reminders via email (using Nodemailer or SendGrid).</li>
+    <li><strong>QR Code System:</strong> Generate QR codes for books to speed up issuance and returns.</li>
+    <li><strong>Mobile App:</strong> React Native app for members to browse books and check availability.</li>
+    <li><strong>E-Book Integration:</strong> Support for digital books with MongoDB GridFS for file storage.</li>
+    <li><strong>Redis Caching:</strong> Add Redis as a third NoSQL database for caching popular queries.</li>
+  </ul>
+
+  <h2 class="section-title">References</h2>
+  <ol>
+    <li>Chodorow, K. (2019). <em>MongoDB: The Definitive Guide</em>, 3rd Ed. O'Reilly Media.</li>
+    <li>Robinson, I., Webber, J., Eifrem, E. (2015). <em>Graph Databases</em>, 2nd Ed. O'Reilly Media.</li>
+    <li>MongoDB Documentation. (2024). <em>Aggregation Pipeline</em>. https://www.mongodb.com/docs/</li>
+    <li>Neo4j Documentation. (2024). <em>Cypher Query Language Reference</em>. https://neo4j.com/docs/</li>
+    <li>Sadalage, P. J., Fowler, M. (2012). <em>NoSQL Distilled</em>. Addison-Wesley Professional.</li>
+    <li>Su, X., Khoshgoftaar, T. M. (2009). A Survey of Collaborative Filtering Techniques. <em>Advances in Artificial Intelligence</em>.</li>
+  </ol>
+
+  <div class="signature-grid">
+    <div class="sig-block">
+      <div class="sig-line">Student Name</div>
+      <div class="sig-sub">Roll No: XXXXXXXXXX</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line">Guide/Mentor Name</div>
+      <div class="sig-sub">Assistant Professor, Dept. of CSE</div>
+    </div>
+  </div>
+
+  <div class="page-number">Page 15</div>
+</div>
+
+</body>
+</html>

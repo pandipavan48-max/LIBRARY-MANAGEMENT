@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LibraryOS — Smart Library Management System</title>
+  <meta name="description" content="A modern Library Management and Book Recommendation System powered by MongoDB & Neo4j NoSQL databases." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage" class="page active">
+  <div class="login-bg">
+    <div class="login-shapes">
+      <div class="shape s1"></div>
+      <div class="shape s2"></div>
+      <div class="shape s3"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon">📚</div>
+        <h1 class="login-title">LibraryOS</h1>
+        <p class="login-sub">Smart Library Management System</p>
+        <div class="db-badges">
+          <span class="db-badge mongo">MongoDB</span>
+          <span class="db-badge neo">Neo4j</span>
+        </div>
+      </div>
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="loginEmail" placeholder="admin@library.com" value="admin@library.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="loginPass">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="loginPass" placeholder="••••••••" value="admin123" required />
+          </div>
+        </div>
+        <div class="login-extras">
+          <label class="remember-me"><input type="checkbox" checked /> Remember me</label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span>Sign In to Dashboard</span>
+          <span class="btn-arrow">→</span>
+        </button>
+        <p class="login-hint">Use: admin@library.com / admin123</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="appPage" class="page" style="display:none;">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="logo-icon-sm">📚</span>
+        <span class="logo-text">LibraryOS</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">☰</button>
+    </div>
+
+    <div class="sidebar-db-info">
+      <div class="db-pill active-db"><span class="db-dot mongo-dot"></span> MongoDB</div>
+      <div class="db-pill active-db"><span class="db-dot neo-dot"></span> Neo4j</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+        <span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-page="books" id="nav-books">
+        <span class="nav-icon">📖</span><span class="nav-label">Books</span>
+        <span class="nav-badge" id="booksBadge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-page="members" id="nav-members">
+        <span class="nav-icon">👥</span><span class="nav-label">Members</span>
+      </a>
+      <a href="#" class="nav-item" data-page="transactions" id="nav-transactions">
+        <span class="nav-icon">🔄</span><span class="nav-label">Transactions</span>
+      </a>
+
+      <div class="nav-section-label">Analytics</div>
+      <a href="#" class="nav-item" data-page="recommendations" id="nav-recommendations">
+        <span class="nav-icon">🔗</span><span class="nav-label">Recommendations</span>
+        <span class="neo4j-tag">Neo4j</span>
+      </a>
+      <a href="#" class="nav-item" data-page="fines" id="nav-fines">
+        <span class="nav-icon">💰</span><span class="nav-label">Fines</span>
+      </a>
+      <a href="#" class="nav-item" data-page="reports" id="nav-reports">
+        <span class="nav-icon">📊</span><span class="nav-label">Reports</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <div class="admin-avatar">A</div>
+        <div>
+          <div class="admin-name">Admin User</div>
+          <div class="admin-role">Librarian</div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn" title="Logout">⏻</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="page-title" id="pageTitle">Dashboard</h2>
+        <div class="breadcrumb" id="breadcrumb">Home / Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <span>🔍</span>
+          <input type="text" id="globalSearch" placeholder="Search books, members..." />
+        </div>
+        <button class="notif-btn" title="Notifications">
+          🔔 <span class="notif-dot"></span>
+        </button>
+        <div class="topbar-avatar">A</div>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="content-section active" id="section-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" style="--accent:#6366f1">
+          <div class="stat-icon">📚</div>
+          <div class="stat-info">
+            <div class="stat-value" id="totalBooks">0</div>
+            <div class="stat-label">Total Books</div>
+          </div>
+          <div class="stat-trend up">+12%</div>
+        </div>
+        <div class="stat-card" style="--accent:#10b981">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <div class="stat-value" id="totalMembers">0</div>
+            <div class="stat-label">Active Members</div>
+          </div>
+          <div class="stat-trend up">+5%</div>
+        </div>
+        <div class="stat-card" style="--accent:#f59e0b">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-info">
+            <div class="stat-value" id="activeLoans">0</div>
+            <div class="stat-label">Active Loans</div>
+          </div>
+          <div class="stat-trend down">-3%</div>
+        </div>
+        <div class="stat-card" style="--accent:#ef4444">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="overdueCount">0</div>
+            <div class="stat-label">Overdue Books</div>
+          </div>
+          <div class="stat-trend up">+2</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Recent Transactions -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>Recent Transactions</h3>
+            <button class="btn-sm" onclick="showPage('transactions')">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table class="mini-table" id="recentTransTable">
+              <thead><tr><th>Member</th><th>Book</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="recentTransBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Popular Genres -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>Books by Genre</h3>
+          </div>
+          <div class="genre-chart" id="genreChart"></div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="dash-card quick-actions-card">
+          <div class="dash-card-header"><h3>Quick Actions</h3></div>
+          <div class="quick-actions">
+            <button class="qa-btn" onclick="openModal('addBookModal')">
+              <span class="qa-icon">➕</span>
+              <span>Add Book</span>
+            </button>
+            <button class="qa-btn" onclick="openModal('addMemberModal')">
+              <span class="qa-icon">👤</span>
+              <span>Add Member</span>
+            </button>
+            <button class="qa-btn" onclick="openModal('issueBookModal')">
+              <span class="qa-icon">📤</span>
+              <span>Issue Book</span>
+            </button>
+            <button class="qa-btn" onclick="openModal('returnBookModal')">
+              <span class="qa-icon">📥</span>
+              <span>Return Book</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- DB Status -->
+        <div class="dash-card db-status-card">
+          <div class="dash-card-header"><h3>Database Status</h3></div>
+          <div class="db-status-list">
+            <div class="db-status-item">
+              <div class="db-status-icon mongo-icon">M</div>
+              <div class="db-status-info">
+                <div class="db-status-name">MongoDB</div>
+                <div class="db-status-desc">Books, Members, Transactions</div>
+              </div>
+              <div class="db-status-badge connected">● Connected</div>
+            </div>
+            <div class="db-status-item">
+              <div class="db-status-icon neo-icon">N</div>
+              <div class="db-status-info">
+                <div class="db-status-name">Neo4j</div>
+                <div class="db-status-desc">Graph Recommendations</div>
+              </div>
+              <div class="db-status-badge connected">● Connected</div>
+            </div>
+          </div>
+          <div class="db-query-box">
+            <div class="db-query-label">Sample MongoDB Query</div>
+            <code class="db-query">db.books.find({ genre: "Fiction" }).sort({ rating: -1 })</code>
+            <div class="db-query-label" style="margin-top:10px">Sample Cypher (Neo4j)</div>
+            <code class="db-query">MATCH (u:User)-[:BORROWED]->(b:Book)<br>&lt;-[:BORROWED]-(other:User)<br>RETURN b.title LIMIT 5</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BOOKS ===== -->
+    <section class="content-section" id="section-books">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="search-input" id="bookSearch" placeholder="🔍 Search books..." oninput="filterBooks()" />
+          <select class="filter-select" id="genreFilter" onchange="filterBooks()">
+            <option value="">All Genres</option>
+            <option>Fiction</option>
+            <option>Non-Fiction</option>
+            <option>Science</option>
+            <option>Technology</option>
+            <option>History</option>
+            <option>Mystery</option>
+            <option>Biography</option>
+            <option>Self-Help</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn-view active" id="gridViewBtn" onclick="setBookView('grid')" title="Grid view">⊞</button>
+          <button class="btn-view" id="listViewBtn" onclick="setBookView('list')" title="List view">☰</button>
+          <button class="btn-primary" onclick="openModal('addBookModal')">+ Add Book</button>
+        </div>
+      </div>
+
+      <div class="books-grid" id="booksGrid"></div>
+      <div class="books-list-wrap" id="booksListWrap" style="display:none">
+        <table class="data-table" id="booksListTable">
+          <thead><tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>ISBN</th><th>Copies</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="booksListBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== MEMBERS ===== -->
+    <section class="content-section" id="section-members">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="search-input" id="memberSearch" placeholder="🔍 Search members..." oninput="filterMembers()" />
+          <select class="filter-select" id="memberStatusFilter" onchange="filterMembers()">
+            <option value="">All Status</option>
+            <option>Active</option>
+            <option>Suspended</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn-primary" onclick="openModal('addMemberModal')">+ Add Member</button>
+        </div>
+      </div>
+      <div class="members-grid" id="membersGrid"></div>
+    </section>
+
+    <!-- ===== TRANSACTIONS ===== -->
+    <section class="content-section" id="section-transactions">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="search-input" id="transSearch" placeholder="🔍 Search transactions..." oninput="filterTrans()" />
+          <select class="filter-select" id="transStatusFilter" onchange="filterTrans()">
+            <option value="">All Status</option>
+            <option>Active</option>
+            <option>Returned</option>
+            <option>Overdue</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn-secondary" onclick="openModal('returnBookModal')">📥 Return Book</button>
+          <button class="btn-primary" onclick="openModal('issueBookModal')">📤 Issue Book</button>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="data-table" id="transTable">
+          <thead>
+            <tr>
+              <th>Trans. ID</th><th>Member</th><th>Book</th><th>Issue Date</th>
+              <th>Due Date</th><th>Return Date</th><th>Fine</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="transBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== RECOMMENDATIONS (Neo4j) ===== -->
+    <section class="content-section" id="section-recommendations">
+      <div class="neo4j-header">
+        <div class="neo4j-badge-big">
+          <span class="neo-dot-big">●</span> Powered by Neo4j Graph Database
+        </div>
+        <p class="neo4j-desc">Book recommendations are generated using collaborative filtering on a property graph. Members who borrowed similar books are connected, and new recommendations are surfaced via Cypher queries.</p>
+      </div>
+
+      <div class="graph-section">
+        <div class="cypher-box">
+          <div class="cypher-title">🔎 Cypher Query (Live)</div>
+          <div class="cypher-code">
+            MATCH (u:Member {id: $memberId})-[:BORROWED]->(b:Book)<br>
+            &lt;-[:BORROWED]-(similar:Member)-[:BORROWED]->(rec:Book)<br>
+            WHERE NOT (u)-[:BORROWED]->(rec)<br>
+            RETURN rec.title, rec.author, COUNT(*) AS score<br>
+            ORDER BY score DESC LIMIT 5
+          </div>
+        </div>
+        <div class="graph-canvas-wrap">
+          <canvas id="graphCanvas" width="600" height="340"></canvas>
+        </div>
+      </div>
+
+      <div class="rec-section-title">📘 Recommended Books</div>
+      <div class="recommendations-member-select">
+        <label>Select Member to get recommendations:</label>
+        <select id="recMemberSelect" onchange="showRecommendations()">
+          <option value="">-- Choose a member --</option>
+        </select>
+      </div>
+      <div class="rec-grid" id="recGrid">
+        <div class="rec-placeholder">Select a member to see personalized book recommendations</div>
+      </div>
+    </section>
+
+    <!-- ===== FINES ===== -->
+    <section class="content-section" id="section-fines">
+      <div class="fines-summary">
+        <div class="fine-summary-card">
+          <div class="fine-icon">💰</div>
+          <div class="fine-info"><div class="fine-value" id="totalFinesOwed">₹0</div><div class="fine-label">Total Outstanding</div></div>
+        </div>
+        <div class="fine-summary-card">
+          <div class="fine-icon">✅</div>
+          <div class="fine-info"><div class="fine-value" id="totalFinesCollected">₹0</div><div class="fine-label">Collected</div></div>
+        </div>
+        <div class="fine-summary-card">
+          <div class="fine-icon">⚠️</div>
+          <div class="fine-info"><div class="fine-value" id="overdueMembers">0</div><div class="fine-label">Overdue Members</div></div>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="data-table">
+          <thead><tr><th>Member</th><th>Book</th><th>Days Overdue</th><th>Fine Amount</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="finesBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== REPORTS ===== -->
+    <section class="content-section" id="section-reports">
+      <div class="reports-grid">
+        <div class="report-card">
+          <div class="report-card-header">
+            <h3>📈 Monthly Checkouts</h3>
+            <select class="filter-select-sm">
+              <option>Last 6 Months</option>
+              <option>Last Year</option>
+            </select>
+          </div>
+          <canvas id="checkoutChart" width="400" height="220"></canvas>
+        </div>
+        <div class="report-card">
+          <div class="report-card-header">
+            <h3>🏷️ Genre Distribution</h3>
+          </div>
+          <canvas id="genrePieChart" width="400" height="220"></canvas>
+        </div>
+        <div class="report-card full-width">
+          <div class="report-card-header">
+            <h3>🏆 Top Borrowed Books</h3>
+            <button class="btn-sm" onclick="exportReport()">⬇ Export CSV</button>
+          </div>
+          <table class="data-table" id="topBooksTable">
+            <thead><tr><th>Rank</th><th>Title</th><th>Author</th><th>Genre</th><th>Times Borrowed</th><th>Rating</th></tr></thead>
+            <tbody id="topBooksBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== MODALS ===== -->
+<!-- Add Book Modal -->
+<div class="modal-overlay" id="addBookModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📖 Add New Book</h3>
+      <button class="modal-close" onclick="closeModal('addBookModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Book Title *</label>
+          <input type="text" id="bookTitle" placeholder="e.g. The Great Gatsby" />
+        </div>
+        <div class="form-group">
+          <label>Author *</label>
+          <input type="text" id="bookAuthor" placeholder="e.g. F. Scott Fitzgerald" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ISBN *</label>
+          <input type="text" id="bookISBN" placeholder="e.g. 978-0-7432-7356-5" />
+        </div>
+        <div class="form-group">
+          <label>Genre *</label>
+          <select id="bookGenre">
+            <option>Fiction</option>
+            <option>Non-Fiction</option>
+            <option>Science</option>
+            <option>Technology</option>
+            <option>History</option>
+            <option>Mystery</option>
+            <option>Biography</option>
+            <option>Self-Help</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Publisher</label>
+          <input type="text" id="bookPublisher" placeholder="Publisher name" />
+        </div>
+        <div class="form-group">
+          <label>Year Published</label>
+          <input type="number" id="bookYear" placeholder="e.g. 2020" min="1800" max="2026" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Total Copies *</label>
+          <input type="number" id="bookCopies" placeholder="e.g. 5" min="1" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Shelf Location</label>
+          <input type="text" id="bookShelf" placeholder="e.g. A-12" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="bookDesc" rows="3" placeholder="Brief description of the book..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('addBookModal')">Cancel</button>
+      <button class="btn-primary" onclick="addBook()">Add Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal-overlay" id="addMemberModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>👤 Register New Member</h3>
+      <button class="modal-close" onclick="closeModal('addMemberModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="memberName" placeholder="e.g. Ravi Kumar" />
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="memberEmail" placeholder="ravi@email.com" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="memberPhone" placeholder="+91 98765 43210" />
+        </div>
+        <div class="form-group">
+          <label>Member Type</label>
+          <select id="memberType">
+            <option>Student</option>
+            <option>Faculty</option>
+            <option>Staff</option>
+            <option>External</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <textarea id="memberAddress" rows="2" placeholder="Full address..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Membership Valid Until</label>
+        <input type="date" id="memberExpiry" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('addMemberModal')">Cancel</button>
+      <button class="btn-primary" onclick="addMember()">Register Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- Issue Book Modal -->
+<div class="modal-overlay" id="issueBookModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📤 Issue Book</h3>
+      <button class="modal-close" onclick="closeModal('issueBookModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Select Member *</label>
+        <select id="issueMember"></select>
+      </div>
+      <div class="form-group">
+        <label>Select Book *</label>
+        <select id="issueBook"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Issue Date</label>
+          <input type="date" id="issueDate" />
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="dueDate" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('issueBookModal')">Cancel</button>
+      <button class="btn-primary" onclick="issueBook()">Issue Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- Return Book Modal -->
+<div class="modal-overlay" id="returnBookModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📥 Return Book</h3>
+      <button class="modal-close" onclick="closeModal('returnBookModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Select Active Transaction *</label>
+        <select id="returnTrans"></select>
+      </div>
+      <div class="form-group">
+        <label>Return Date</label>
+        <input type="date" id="returnDate" />
+      </div>
+      <div class="fine-preview" id="finePreview" style="display:none">
+        <div class="fine-preview-label">Fine Amount:</div>
+        <div class="fine-preview-value" id="fineAmount">₹0</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('returnBookModal')">Cancel</button>
+      <button class="btn-primary" onclick="returnBook()">Return Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- Book Detail Modal -->
+<div class="modal-overlay" id="bookDetailModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="detailBookTitle">Book Details</h3>
+      <button class="modal-close" onclick="closeModal('bookDetailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="bookDetailBody"></div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
